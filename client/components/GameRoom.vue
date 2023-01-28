@@ -17,7 +17,7 @@ let name = useLocalStorage('name', '');
 let roomId = route.params.roomId as string;
 let isLoaded = ref(false);
 let room: Room;
-let state = ref<{ players: Map<string, any>; } | undefined>(undefined);
+let state = ref<{ players: Map<string, any>; currentPhrase: string; } | undefined>(undefined);
 let input = ref('');
 let messages = ref<Message[]>([]);
 let chatElement = ref<HTMLDivElement>();
@@ -35,7 +35,7 @@ onMounted(async () => {
   isLoaded.value = true;
 
   room.onStateChange((s) => {
-    state.value = { players: new Map(s.players) };
+    state.value = { players: new Map(s.players), currentPhrase: s.currentPhrase };
   });
 
   room.onMessage('message', (message: Message) => {
@@ -75,19 +75,33 @@ function submit() {
   <div class="bg-base-200 flex flex-grow">
     <div class="text-center flex flex-col md:flex-row flex-grow w-full" id="game-container">
       <div class="flex flex-col md:flex-grow h-1/2 md:h-auto" v-if="isLoaded">
-        <h1 class="text-5xl font-bold center gap-2 mb-8">
-          Game
+        <h1 class="text-2xl font-bold center gap-2 mb-4">
+          Phrase length: {{ state?.currentPhrase.length }}
         </h1>
 
-        <div>
-          <h3>People in the room:</h3>
-          <ul>
-            <li class="list-none" v-for="[id, player] in state?.players">{{ player.name }}</li>
-          </ul>
+        <div class="center flex-wrap mb-4">
+          <kbd class="kbd" v-for="char in state?.currentPhrase.split('')">{{ char }}</kbd>
+        </div>
+
+        <div class="stats stats-vertical shadow bg-primary text-primary-content">
+          <div class="stat">
+            <div class="stat-title">Actions</div>
+            <div class="stat-actions">
+              <button class="btn btn-sm btn-secondary" @click="room.send('getNextPhrase')">Next Phrase</button>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="stat" v-for="[_, player] in state?.players">
+            <div class="stat-title">Player: {{ player.name }}</div>
+            <!-- <div class="stat-value">Points: {{ player.points }}</div> -->
+            <div class="stat-desc">Points: {{ player.points }}</div>
+          </div>
         </div>
       </div>
 
-      <div class="flex flex-col flex-grow md:max-w-md relative h-1/2 md:h-auto" v-if="isLoaded">
+      <div class="flex flex-col flex-grow md:max-w-md relative h-1/2 md:h-auto md:min-w-10" v-if="isLoaded">
         <div class="flex flex-col mb-12 overflow-y-scroll" ref="chatElement">
           <div class="chat" :class="{
             'chat-end': message.id === room.sessionId,

@@ -6,10 +6,7 @@ export class LobbyRoom extends Room<LobbyState> {
     this.setState(new LobbyState());
 
     this.onMessage('editName', (client, newName: string) => {
-      let player = this.state.players.get(client.sessionId);
-      player.name = newName;
-      this.state.players.set(client.sessionId, player);
-      // this.setState(this.state);
+      this.state.updatePlayer(client.sessionId, player => (player.name = newName));
     });
 
     this.onMessage('listRooms', async client => {

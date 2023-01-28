@@ -10,7 +10,7 @@
     "start": "node ./build/index.js",
     "build": "npm run clean && npm run build-client && npm run build-server",
     "build-client": "vite build --config vite.config.ts --ssrManifest",
-    "build-server": "tsc && copyfiles package.json ./build",
+    "build-server": "tsc && copyfiles package.json ./build && cp ./server/public/* ./build/public",
     "clean": "rimraf build",
     "dev": "concurrently \"npm:dev-*\"",
     "dev-client": "vite --config vite.config.ts",

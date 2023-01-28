@@ -1,20 +1,41 @@
+import fs from 'fs/promises';
+import path from 'path';
 import { Room, Client, matchMaker } from 'colyseus';
 import { GameState, Player } from './GameState';
 
 export class GameRoom extends Room<GameState> {
-  intervalId?: number;
+  timer?: number;
+  phrases: string[];
 
   onCreate(options: any) {
     this.autoDispose = false;
-    console.log('GameRoom created');
+    this.clock.start();
+
+    fs.readFile(path.resolve(__dirname, '../public/cliches.txt'), { encoding: 'utf8' }).then(
+      file => {
+        this.phrases = this.parsePhrases(file);
+        this.state.currentPhrase = this.getNextPhrase();
+      }
+    );
+
     this.setState(new GameState());
+    console.log('GameRoom created', this.state.currentPhrase);
 
     this.onMessage('setRoomId', async (client, roomId: string) => {
       this.roomId = roomId;
     });
 
     this.onMessage('message', (client, message) => {
+      if (message.text.toLowerCase() === this.state.currentPhrase.toLowerCase()) {
+        this.state.updatePlayer(client.sessionId, player => {
+          player.points += 1;
+        });
+      }
       this.broadcast('message', { ...message, id: client.sessionId });
+    });
+
+    this.onMessage('getNextPhrase', client => {
+      this.state.currentPhrase = this.getNextPhrase();
     });
   }
 
@@ -38,5 +59,18 @@ export class GameRoom extends Room<GameState> {
 
   onDispose() {
     console.log('GameRoom', this.roomId, 'disposing...');
+  }
+
+  parsePhrases(file: string): string[] {
+    return file.split('\n');
+  }
+
+  randomInt(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min) + min);
+  }
+
+  getNextPhrase(): string {
+    let index = this.randomInt(0, this.phrases.length);
+    return this.phrases[index];
   }
 }
