@@ -1,26 +1,43 @@
-import { Room, Client } from 'colyseus';
-import { MyRoomState } from './schema/MyRoomState';
+import { Room, Client, matchMaker } from 'colyseus';
+import { LobbyState, Player } from './LobbyState';
 
-export class LobbyRoom extends Room<MyRoomState> {
+export class LobbyRoom extends Room<LobbyState> {
   onCreate(options: any) {
-    this.setState(new MyRoomState());
+    this.setState(new LobbyState());
 
-    this.onMessage('type', (client, message) => {
-      //
-      // handle "type" message
-      //
+    this.onMessage('editName', (client, newName: string) => {
+      let player = this.state.players.get(client.sessionId);
+      player.name = newName;
+      this.state.players.set(client.sessionId, player);
+      // this.setState(this.state);
+    });
+
+    this.onMessage('listRooms', async client => {
+      client.send('listRooms', await matchMaker.query({ name: 'GameRoom' }));
+    });
+
+    this.onMessage('createRoom', async client => {
+      let room = await matchMaker.createRoom('GameRoom', {});
+      client.send('roomCreated', { roomId: room.roomId, name: room.name });
     });
   }
 
   onJoin(client: Client, options: any) {
     console.log(client.sessionId, 'joined!');
+    let player = new Player();
+    player.id = client.sessionId;
+    player.name = options.name || client.sessionId;
+    this.state.players.set(client.sessionId, player);
   }
 
   onLeave(client: Client, consented: boolean) {
     console.log(client.sessionId, 'left!');
+    if (this.state.players.has(client.sessionId)) {
+      this.state.players.delete(client.sessionId);
+    }
   }
 
   onDispose() {
-    console.log('room', this.roomId, 'disposing...');
+    console.log('LobbyRoom', this.roomId, 'disposing...');
   }
 }

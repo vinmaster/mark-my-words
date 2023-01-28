@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import Home from './components/Home.vue';
+import LobbyRoom from './components/LobbyRoom.vue';
+import GameRoom from './components/GameRoom.vue';
 
 export const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'Lobby',
+    component: LobbyRoom,
+  },
+  {
+    path: '/rooms/:roomId',
+    name: 'GameRoom',
+    component: GameRoom,
   },
 ];
 
