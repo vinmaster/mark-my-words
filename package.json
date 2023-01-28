@@ -2,6 +2,10 @@
   "private": true,
   "name": "mark-my-words",
   "version": "1.0.0",
+  "engines": {
+    "npm": ">=8",
+    "node": ">=16"
+  },
   "scripts": {
     "start": "node ./build/index.js",
     "build": "npm run clean && npm run build-client && npm run build-server",
