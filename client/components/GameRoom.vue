@@ -68,25 +68,26 @@ function submit() {
 </script>
 
 <template>
+  <div class="center" v-if="!isLoaded">
+    <div class="badge badge-accent">Connecting...</div>
+  </div>
+
   <div class="bg-base-200 flex flex-grow">
     <div class="text-center flex flex-col md:flex-row flex-grow w-full" id="game-container">
-      <div class="flex flex-col md:flex-grow h-1/2 md:h-auto">
+      <div class="flex flex-col md:flex-grow h-1/2 md:h-auto" v-if="isLoaded">
         <h1 class="text-5xl font-bold center gap-2 mb-8">
           Game
-          <div v-if="!isLoaded" class="badge badge-accent">Connecting...</div>
         </h1>
 
         <div>
-          <h3>
-            People in the room:
-            <ul>
-              <li class="list-none" v-for="[id, player] in state?.players">{{ player.name }}</li>
-            </ul>
-          </h3>
+          <h3>People in the room:</h3>
+          <ul>
+            <li class="list-none" v-for="[id, player] in state?.players">{{ player.name }}</li>
+          </ul>
         </div>
       </div>
 
-      <div class="flex flex-col flex-grow md:max-w-md relative h-1/2 md:h-auto">
+      <div class="flex flex-col flex-grow md:max-w-md relative h-1/2 md:h-auto" v-if="isLoaded">
         <div class="flex flex-col mb-12 overflow-y-scroll" ref="chatElement">
           <div class="chat" :class="{
             'chat-end': message.id === room.sessionId,

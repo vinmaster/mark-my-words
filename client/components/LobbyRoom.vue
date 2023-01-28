@@ -85,26 +85,26 @@ async function gotoRoom(roomId: string) {
     <div class="hero-content text-center flex flex-col w-full max-w-3xl">
       <h1 class="text-5xl font-bold center gap-2 mb-8">
         Lobby
-        <div v-if="!isLoaded" class="badge badge-accent">Connecting...</div>
       </h1>
+      <div v-if="!isLoaded" class="badge badge-accent">Connecting...</div>
 
-      <div class="card bg-base-100 shadow-xl w-11/12">
+      <div class="card bg-base-100 shadow-xl w-11/12" v-if="isLoaded">
         <div class="card-body">
           <h1 class="text-xl">Hi, {{ name }}<button class="btn btn-accent ml-2" @click="editName">Edit Name</button>
           </h1>
-          <h3>
-            People in the lobby:
-            <ul>
-              <li class="list-none" v-for="[id, player] in state?.players">{{ player.name }}</li>
-            </ul>
-          </h3>
+          <h3>People in the lobby:</h3>
+          <ul>
+            <li class="list-none" v-for="[id, player] in state?.players">{{ player.name }}</li>
+          </ul>
           <hr />
           <h2 class="card-title center">List of Game Rooms</h2>
           <p>Join one below OR</p>
           <button type="button" class="btn btn-primary" @click="createRoom()">Create Room</button>
           <hr />
           <button type="button" class="btn btn-secondary" @click="refresh" v-if="isLoaded">Refresh</button>
-          <div class="card-actions justify-between items-center" v-for="room in rooms">
+          <div
+            class="card-actions justify-between items-center p-2 rounded-lg border border-purple-600 flex-col md:flex-row"
+            v-for="room in rooms">
             <span>{{ room.name }}</span>
             <span>{{ room.roomId }}</span>
             <span>{{ room.clients }} players</span>

@@ -5,7 +5,10 @@ export class Connection {
   static client: Client;
 
   static setup() {
-    let url = this.IS_DEV ? `ws://localhost:8000` : `wss://${window.location.host}`;
+    let protocol = location.protocol === 'http:' ? 'ws' : 'wss';
+    let url = this.IS_DEV
+      ? `${protocol}://localhost:8000`
+      : `${protocol}://${window.location.host}`;
     this.client = new Client(url);
   }
 }
