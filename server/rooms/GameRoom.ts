@@ -26,7 +26,7 @@ export class GameRoom extends Room<GameState> {
     });
 
     this.onMessage('message', (client, message) => {
-      if (message.text.toLowerCase() === this.state.currentPhrase.toLowerCase()) {
+      if (this.cleanPhrase(message.text) === this.state.currentPhrase) {
         this.state.updatePlayer(client.sessionId, player => {
           player.points += 1;
         });
@@ -61,6 +61,10 @@ export class GameRoom extends Room<GameState> {
     console.log('GameRoom', this.roomId, 'disposing...');
   }
 
+  cleanPhrase(str: string) {
+    return str.toLowerCase().replace(/[^a-z 0-9+]+/gi, '');
+  }
+
   parsePhrases(file: string): string[] {
     return file.split('\n');
   }
@@ -71,6 +75,6 @@ export class GameRoom extends Room<GameState> {
 
   getNextPhrase(): string {
     let index = this.randomInt(0, this.phrases.length);
-    return this.phrases[index];
+    return this.cleanPhrase(this.phrases[index]);
   }
 }

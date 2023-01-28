@@ -79,7 +79,7 @@ function submit() {
           Phrase length: {{ state?.currentPhrase.length }}
         </h1>
 
-        <div class="center flex-wrap mb-4">
+        <div class="center flex-wrap gap-1 mb-4">
           <kbd class="kbd" v-for="char in state?.currentPhrase.split('')">{{ char }}</kbd>
         </div>
 
